@@ -102,6 +102,7 @@ def depthFirstSearch(problem):
     # problem.getStartState() gets called only once
     visited = []
     stack = util.Stack()
+    path_to_goal = []
     moves = []
 
     visited.append((problem.getStartState(), "NULL", 0))
@@ -111,13 +112,29 @@ def depthFirstSearch(problem):
         cur = stack.pop()
         visited.append((cur[0], cur[1], cur[2]))
         if problem.isGoalState(cur[0]):
-            return # moves list (once it's implemented)
+            path_to_goal.append(cur[1])
         successors = problem.getSuccessors(cur[0])
         for i, y, x in successors:
-            print("i: ", (i, y, x))
-            stack.push((i, y, x))
+            if (i, y, x) not in visited:
+                # print("i: ", (i, y, x))
+                stack.push((i, y, x))
 
-    print(visited)
+    # convert all the moves to the actual direction types and return
+    index = 0
+    for i in path_to_goal:
+        match i[index][1]:
+            case "North":
+                moves.append(north)
+            case "South":
+                moves.append(south)
+            case "East":
+                moves.append(east)
+            case "West":
+                moves.append(west)
+            case _:
+                moves.append(None)
+        index += 1
+    print(moves)
     return moves
     util.raiseNotDefined()
 
