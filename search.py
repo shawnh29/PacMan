@@ -87,65 +87,111 @@ def depthFirstSearch(problem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    from game import Directions
     print("\n")
     print(type(problem))
     print("Start:", problem.getStartState())
     print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     print("\n")
-    north = Directions.NORTH
-    east = Directions.EAST
-    south = Directions.SOUTH
-    west = Directions.WEST
 
     # problem.getStartState() gets called only once
-    visited = []
+    visited = {}  # dictionary that stores the visited nodes and how (what direction) we took to get there
     stack = util.Stack()
-    path_to_goal = []
-    moves = []
+    moves = [] # holds the list of moves that leads PacMan to goal state (ex. "West", "South")
+    path = {} # 
 
-    visited.append((problem.getStartState(), "NULL", 0))
-    stack.push((problem.getStartState(), "NULL", 0))
-
+    stack.push((problem.getStartState(), "", 0))
+    visited[problem.getStartState()] = ""
+    if problem.isGoalState(problem.getStartState()):
+        return 
+    
     while stack:
         cur = stack.pop()
-        visited.append((cur[0], cur[1], cur[2]))
+        visited[cur[0]] = cur[1] # ex. (5,4) : West
         if problem.isGoalState(cur[0]):
-            path_to_goal.append(cur[1])
-        successors = problem.getSuccessors(cur[0])
-        for i, y, x in successors:
-            if (i, y, x) not in visited:
-                # print("i: ", (i, y, x))
-                stack.push((i, y, x))
+            last = cur[0]
+            break
+        # if a successor has not been visited, add it to the stack and the path, along with the current node
+        for adjacent in problem.getSuccessors(cur[0]):
+            if adjacent[0] not in visited.keys():
+                stack.push(adjacent)
+                path[adjacent[0]] = cur[0]  # ex. (4,5) : (4,4)
 
-    # convert all the moves to the actual direction types and return
-    index = 0
-    for i in path_to_goal:
-        match i[index][1]:
-            case "North":
-                moves.append(north)
-            case "South":
-                moves.append(south)
-            case "East":
-                moves.append(east)
-            case "West":
-                moves.append(west)
-            case _:
-                moves.append(None)
-        index += 1
-    print(moves)
+    # last is the node that is the goal state, so we are back-tracking
+    while last in path.keys():
+        temp = path[last]
+        moves.insert(0, visited[last]) # 'visited[last]' is the action required to get to the 'last' node (i.e. "West", "South", etc.)
+        last = temp
     return moves
     util.raiseNotDefined()
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
+    visited = {}  # dictionary that stores the visited nodes and how (what direction) we took to get there
+    queue = util.Queue()
+    moves = [] # holds the list of moves that leads PacMan to goal state (ex. "West", "South")
+    path = {} 
+
+    queue.push((problem.getStartState(), "", 0))
+    visited[problem.getStartState()] = ""
+    if problem.isGoalState(problem.getStartState()):
+        return 
+    
+    while queue:
+        cur = queue.pop()
+        visited[cur[0]] = cur[1] # ex. (5,4) : West
+        if problem.isGoalState(cur[0]):
+            last = cur[0]
+            break
+        # if a successor has not been visited, add it to the queue and the path, along with the current node
+        for adjacent in problem.getSuccessors(cur[0]):
+            if adjacent[0] not in visited.keys():
+                queue.push(adjacent)
+                path[adjacent[0]] = cur[0]  # ex. (4,5) : (4,4)
+
+    # last is the node that is the goal state, so we are back-tracking
+    while last in path.keys():
+        temp = path[last]
+        moves.insert(0, visited[last]) # 'visited[last]' is the action required to get to the 'last' node (i.e. "West", "South", etc.)
+        last = temp
+    return moves
     util.raiseNotDefined()
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
+    visited = {}  # dictionary that stores the visited nodes and how (what direction) we took to get there
+    pq = util.PriorityQueue()
+    moves = [] # holds the list of moves that leads PacMan to goal state (ex. "West", "South")
+    path = {} 
+    count = 0
+
+    count += 1
+    pq.push((problem.getStartState(), "", 0), count)
+    visited[problem.getStartState()] = ""
+    if problem.isGoalState(problem.getStartState()):
+        return 
+    
+    while pq:
+        cur = pq.pop()
+        visited[cur[0]] = cur[1] # ex. (5,4) : West
+        if problem.isGoalState(cur[0]):
+            last = cur[0]
+            break
+        # if a successor has not been visited, add it to the PQ and the path, along with the current node
+        for adjacent in problem.getSuccessors(cur[0]):
+            if adjacent[0] not in visited.keys():
+                count += 1
+                pq.push(adjacent, count)
+                path[adjacent[0]] = cur[0]  # ex. (4,5) : (4,4)
+
+    # last is the node that is the goal state, so we are back-tracking
+    while last in path.keys():
+        temp = path[last]
+        moves.insert(0, visited[last]) # 'visited[last]' is the action required to get to the 'last' node (i.e. "West", "South", etc.)
+        last = temp
+    return moves
     util.raiseNotDefined()
 
 def nullHeuristic(state, problem=None):
