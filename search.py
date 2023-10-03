@@ -165,13 +165,14 @@ def uniformCostSearch(problem):
     pq = util.PriorityQueue()
     moves = [] # holds the list of moves that leads PacMan to goal state (ex. "West", "South")
     path = {} 
-    count = 0
+    cost_dict = {} # ex. (4,5) : 3 --> (4,5) costs 3 to get to
+    # the values in this dict is the TOTAL cost to get to that specific node
 
-    count += 1
-    pq.push((problem.getStartState(), "", 0), count)
+    cost_dict[problem.getStartState()] = 0
+    pq.push((problem.getStartState(), "", 0), 0)
     visited[problem.getStartState()] = ""
     if problem.isGoalState(problem.getStartState()):
-        return 
+        return
     
     while pq:
         cur = pq.pop()
@@ -182,9 +183,12 @@ def uniformCostSearch(problem):
         # if a successor has not been visited, add it to the PQ and the path, along with the current node
         for adjacent in problem.getSuccessors(cur[0]):
             if adjacent[0] not in visited.keys():
-                count += 1
-                pq.push(adjacent, count)
-                path[adjacent[0]] = cur[0]  # ex. (4,5) : (4,4)
+                priority_val = cur[2] + adjacent[2] # calculate how much it will cost IN TOTAL to get to this adjacent node
+                # we push a node onto the pq only if it is not already in the cost_dict OR the new priority value is smaller than the current cost to get to this node
+                if adjacent[0] not in cost_dict.keys() or cost_dict[adjacent[0]] > priority_val:
+                    pq.push((adjacent[0], adjacent[1], adjacent[2] + cur[2]), priority_val)
+                    path[adjacent[0]] = cur[0]  # ex. (4,5) : (4,4)
+                    cost_dict[adjacent[0]] = priority_val
 
     # last is the node that is the goal state, so we are back-tracking
     while last in path.keys():
@@ -204,6 +208,43 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
+    from searchAgents import manhattanHeuristic
+    visited = {}  # dictionary that stores the visited nodes and how (what direction) we took to get there
+    pq = util.PriorityQueue()
+    moves = [] # holds the list of moves that leads PacMan to goal state (ex. "West", "South")
+    path = {} 
+    cost_dict_w_H = {} # ex. (4,5) : 3 --> (4,5) costs 3 to get to
+    # the values in this dict is the TOTAL cost to get to that specific node
+
+    cost_w_heuristic = 0 + manhattanHeuristic(problem.getStartState(), problem)
+    cost_dict_w_H[problem.getStartState()] = cost_w_heuristic
+    pq.push((problem.getStartState(), "", 0), cost_w_heuristic)
+    visited[problem.getStartState()] = ""
+    if problem.isGoalState(problem.getStartState()):
+        return
+    
+    while pq:
+        cur = pq.pop()
+        visited[cur[0]] = cur[1] # ex. (5,4) : West
+        if problem.isGoalState(cur[0]):
+            last = cur[0]
+            break
+        # if a successor has not been visited, add it to the PQ and the path, along with the current node
+        for adjacent in problem.getSuccessors(cur[0]):
+            if adjacent[0] not in visited.keys():
+                priority_val = cur[2] + adjacent[2] + manhattanHeuristic(adjacent[0], problem)# calculate how much it will cost IN TOTAL to get to this adjacent node
+                # we push a node onto the pq only if it is not already in the cost_dict OR the new priority value is smaller than the current cost to get to this node
+                if adjacent[0] not in cost_dict_w_H.keys() or cost_dict_w_H[adjacent[0]] > priority_val:
+                    pq.push((adjacent[0], adjacent[1], adjacent[2] + cur[2] + manhattanHeuristic(adjacent[0], problem)), priority_val)
+                    path[adjacent[0]] = cur[0]  # ex. (4,5) : (4,4)
+                    cost_dict_w_H[adjacent[0]] = priority_val + manhattanHeuristic(adjacent[0], problem)
+
+    # last is the node that is the goal state, so we are back-tracking
+    while last in path.keys():
+        temp = path[last]
+        moves.insert(0, visited[last]) # 'visited[last]' is the action required to get to the 'last' node (i.e. "West", "South", etc.)
+        last = temp
+    return moves
     util.raiseNotDefined()
 
 
