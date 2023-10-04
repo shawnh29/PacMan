@@ -146,7 +146,7 @@ def breadthFirstSearch(problem):
             break
         # if a successor has not been visited, add it to the queue and the path, along with the current node
         for adjacent in problem.getSuccessors(cur[0]):
-            if adjacent[0] not in visited.keys():
+            if adjacent[0] not in path.keys() and adjacent[0] not in visited.keys():
                 queue.push(adjacent)
                 path[adjacent[0]] = cur[0]  # ex. (4,5) : (4,4)
 
@@ -208,7 +208,6 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    from searchAgents import manhattanHeuristic
     visited = {}  # dictionary that stores the visited nodes and how (what direction) we took to get there
     pq = util.PriorityQueue()
     moves = [] # holds the list of moves that leads PacMan to goal state (ex. "West", "South")
@@ -216,9 +215,8 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     cost_dict_w_H = {} # ex. (4,5) : 3 --> (4,5) costs 3 to get to
     # the values in this dict is the TOTAL cost to get to that specific node
 
-    cost_w_heuristic = 0 + manhattanHeuristic(problem.getStartState(), problem)
-    cost_dict_w_H[problem.getStartState()] = cost_w_heuristic
-    pq.push((problem.getStartState(), "", 0), cost_w_heuristic)
+    cost_dict_w_H[problem.getStartState()] = 0
+    pq.push((problem.getStartState(), "", 0), 0)
     visited[problem.getStartState()] = ""
     if problem.isGoalState(problem.getStartState()):
         return
@@ -232,12 +230,12 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         # if a successor has not been visited, add it to the PQ and the path, along with the current node
         for adjacent in problem.getSuccessors(cur[0]):
             if adjacent[0] not in visited.keys():
-                priority_val = cur[2] + adjacent[2] + manhattanHeuristic(adjacent[0], problem)# calculate how much it will cost IN TOTAL to get to this adjacent node
+                priority_val = cur[2] + adjacent[2] + heuristic(adjacent[0], problem)# calculate how much it will cost IN TOTAL to get to this adjacent node
                 # we push a node onto the pq only if it is not already in the cost_dict OR the new priority value is smaller than the current cost to get to this node
                 if adjacent[0] not in cost_dict_w_H.keys() or cost_dict_w_H[adjacent[0]] > priority_val:
-                    pq.push((adjacent[0], adjacent[1], adjacent[2] + cur[2] + manhattanHeuristic(adjacent[0], problem)), priority_val)
+                    pq.push((adjacent[0], adjacent[1], adjacent[2] + cur[2]), priority_val)
                     path[adjacent[0]] = cur[0]  # ex. (4,5) : (4,4)
-                    cost_dict_w_H[adjacent[0]] = priority_val + manhattanHeuristic(adjacent[0], problem)
+                    cost_dict_w_H[adjacent[0]] = priority_val
 
     # last is the node that is the goal state, so we are back-tracking
     while last in path.keys():

@@ -337,10 +337,10 @@ class CornersProblem(search.SearchProblem):
             nextx, nexty = int(x + dx), int(y + dy)
             hitsWall = self.walls[nextx][nexty]
 
-            corners_left = []
             if not hitsWall:
+                corners_left = []
                 for corner_i in state[1]:
-                    if corner_i != (nextx, nexty):
+                    if not corner_i == (nextx, nexty):
                         corners_left.append(corner_i)
                 successors.append( (( (nextx, nexty), tuple(corners_left) ), action, 1) )
 
@@ -376,8 +376,17 @@ def cornersHeuristic(state, problem):
     shortest path from the state to a goal of the problem; i.e.  it should be
     admissible (as well as consistent).
     """
+    from util import manhattanDistance
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
+  
+    not_visited = state[1] # grab the corners that have not been visited in this current state
+    max = 0
+    for corner in not_visited:
+        corner_distance = manhattanDistance(state[0], corner)
+        if corner_distance > max:
+            max = corner_distance
+    return max 
 
     "*** YOUR CODE HERE ***"
     return 0 # Default to trivial solution
