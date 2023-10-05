@@ -96,7 +96,9 @@ def depthFirstSearch(problem):
 
     if problem.isGoalState(problem.getStartState()):
         return 
+    # start off by pushing the starting state onto the stack 
     stack.push((problem.getStartState(), "", 0))
+    # also start by putting an entry in the visited list of the starting state
     visited[problem.getStartState()] = ""
     
     while stack:
