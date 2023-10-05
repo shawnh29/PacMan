@@ -273,13 +273,14 @@ class CornersProblem(search.SearchProblem):
     You must select a suitable state space and successor function
     """
 
-    """
-    Problem: Finding all the corners
-        States: {(x,y), ( (1,1), (1,top), (right,1), (right,top) )}
-        Actions: NESW
-        Successor: Update location and possibly the list of corners
-        Goal Test: If all corners have been visited
-    """
+    ##################################################################
+    # Problem: Finding all the corners
+    #     States: {(x,y), ( (1,1), (1,top), (right,1), (right,top) )}
+    #     Actions: NESW
+    #     Successor: Update location and possibly the list of corners
+    #     Goal Test: If all corners have been visited
+    ##################################################################
+
 
     def __init__(self, startingGameState):
         """
@@ -305,7 +306,6 @@ class CornersProblem(search.SearchProblem):
         """
         "*** YOUR CODE HERE ***"
         return self.startState
-        util.raiseNotDefined()
 
     def isGoalState(self, state):
         """
@@ -315,7 +315,6 @@ class CornersProblem(search.SearchProblem):
         if len(state[1]) == 0: # i.e. the list of corners is empty --> we've visited all of them
             return True
         return False
-        util.raiseNotDefined()
 
     def getSuccessors(self, state):
         """
@@ -337,11 +336,13 @@ class CornersProblem(search.SearchProblem):
             nextx, nexty = int(x + dx), int(y + dy)
             hitsWall = self.walls[nextx][nexty]
 
+            corners_left = []
             if not hitsWall:
-                corners_left = []
+                # if the next action doesn't hit a wall, loop through every remaining corner
                 for corner_i in state[1]:
-                    if not corner_i == (nextx, nexty):
+                    if corner_i != (nextx, nexty):
                         corners_left.append(corner_i)
+                # a successor becomes something like: ( (1,8), ((1,1), (1,top)), "WEST", 1 )
                 successors.append( (( (nextx, nexty), tuple(corners_left) ), action, 1) )
 
             "*** YOUR CODE HERE ***"
@@ -383,6 +384,8 @@ def cornersHeuristic(state, problem):
     not_visited = state[1] # grab the corners that have not been visited in this current state
     max = 0
     for corner in not_visited:
+        # calculate the manhattan distance between the current state and the corners
+        # return the farthest distance
         corner_distance = manhattanDistance(state[0], corner)
         if corner_distance > max:
             max = corner_distance
@@ -487,6 +490,8 @@ def foodHeuristic(state, problem):
     not_visited = state[1].asList()
     max = 0
     for food in not_visited:
+        # calculate manhattan distance between the current position and a food dot
+        # return the distance of the farthest food dot
         food_distance = manhattanDistance(state[0], food)
         if food_distance > max:
             max = food_distance
@@ -524,7 +529,7 @@ class ClosestDotSearchAgent(SearchAgent):
         from search import breadthFirstSearch
 
         "*** YOUR CODE HERE ***"
-        
+        # just call bfs 
         return breadthFirstSearch(problem)
         util.raiseNotDefined()
 
