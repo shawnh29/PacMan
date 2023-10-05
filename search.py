@@ -87,12 +87,6 @@ def depthFirstSearch(problem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    print("\n")
-    print(type(problem))
-    print("Start:", problem.getStartState())
-    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
-    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
-    print("\n")
 
     # problem.getStartState() gets called only once
     visited = {}  # dictionary that stores the visited nodes and how (what direction) we took to get there

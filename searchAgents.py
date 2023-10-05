@@ -481,8 +481,17 @@ def foodHeuristic(state, problem):
     Subsequent calls to this heuristic can access
     problem.heuristicInfo['wallCount']
     """
+    from util import manhattanDistance
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
+    not_visited = state[1].asList()
+    max = 0
+    for food in not_visited:
+        food_distance = manhattanDistance(state[0], food)
+        if food_distance > max:
+            max = food_distance
+    return max
+
     return 0
 
 class ClosestDotSearchAgent(SearchAgent):
@@ -512,8 +521,11 @@ class ClosestDotSearchAgent(SearchAgent):
         food = gameState.getFood()
         walls = gameState.getWalls()
         problem = AnyFoodSearchProblem(gameState)
+        from search import breadthFirstSearch
 
         "*** YOUR CODE HERE ***"
+        
+        return breadthFirstSearch(problem)
         util.raiseNotDefined()
 
 class AnyFoodSearchProblem(PositionSearchProblem):
@@ -548,8 +560,11 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         complete the problem definition.
         """
         x,y = state
-
         "*** YOUR CODE HERE ***"
+        # checks if Pacman's current position is where a piece of food is 
+        if state in self.food.asList():
+            return True
+        return False
         util.raiseNotDefined()
 
 def mazeDistance(point1, point2, gameState):
